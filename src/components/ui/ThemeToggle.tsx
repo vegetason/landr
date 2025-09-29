@@ -2,18 +2,18 @@
 
 import * as React from "react"
 import { useTheme } from "next-themes"
-import { Sun, Moon, Monitor } from "lucide-react"
+import { Sun, Moon, Monitor, Check } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
     DropdownMenuContent,
+    DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuRadioGroup,
-    DropdownMenuRadioItem,
-    DropdownMenuSeparator,
+    DropdownMenuSeparator, 
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { cn } from "@/lib/utils"
 
 const themes = [
     {
@@ -78,13 +78,19 @@ export function ThemeToggle() {
             <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Theme</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
-                    {themes.map(({ value, name, Icon }) => (
-                        <DropdownMenuRadioItem key={value} value={value}>
-                            <Icon className="mr-2 h-4 w-4" /> {name}
-                        </DropdownMenuRadioItem>
-                    ))}
-                </DropdownMenuRadioGroup>
+                {themes.map(({ value, name, Icon }) => (
+                    <DropdownMenuItem
+                        key={value}
+                        onSelect={() => setTheme(value)}
+                        className={cn("cursor-pointer",theme==value&&"bg-accent text-accent-foreground")}
+                    >
+                        <Icon className="mr-2 h-4 w-4" />
+                        {name}
+                        {theme === value && (
+                            <Check className="ml-auto h-4 w-4" />
+                        )}
+                    </DropdownMenuItem>
+                ))}
             </DropdownMenuContent>
         </DropdownMenu>
     )
