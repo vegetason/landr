@@ -1,38 +1,39 @@
-import { deleteUser, upsertUser } from "@/features/users/db";
-import { verifyWebhook } from "@clerk/nextjs/webhooks";
-import { NextRequest } from "next/server";
+import { deleteUser, upsertUser } from '@/features/users/db';
+import { verifyWebhook } from '@clerk/nextjs/webhooks';
+import { NextRequest } from 'next/server';
 
-export async function POST(request:NextRequest){
-    try {
-        const event= await verifyWebhook(request)
-        switch(event.type){
-            case "user.created":
-            case "user.updated":
-                const clerkData=event.data
-                const email=clerkData.email_addresses.find((e)=>e.id===clerkData.primary_email_address_id)?.email_address
-                if(email==null) {
-                    return new Response("no Primary email found",{status:400})
-                }
-                await upsertUser({
-                    id:clerkData.id,
-                    email,
-                    name:`${clerkData.first_name} ${clerkData.last_name}`,
-                    username: clerkData.username,
-                    imageUrl: clerkData.image_url,
-                    createdAt:new Date(clerkData.created_at),
-                    updatedAt:new Date(clerkData.updated_at)
-                })
-            break
-            case "user.deleted":
-                if(event.data.id===null){
-                    return new Response("No User id found",{status:400})
-                }
-                await deleteUser(event.data.id!)
-                break
+export async function POST(request: NextRequest) {
+  try {
+    const event = await verifyWebhook(request);
+    switch (event.type) {
+      case 'user.created':
+      case 'user.updated':
+        const clerkData = event.data;
+        const email = clerkData.email_addresses.find(
+          e => e.id === clerkData.primary_email_address_id
+        )?.email_address;
+        if (email == null) {
+          return new Response('no Primary email found', { status: 400 });
         }
-    } catch  {
-        return new Response("Invalid webhook",{status:400})
+        await upsertUser({
+          id: clerkData.id,
+          email,
+          name: `${clerkData.first_name} ${clerkData.last_name}`,
+          username: clerkData.username,
+          imageUrl: clerkData.image_url,
+          createdAt: new Date(clerkData.created_at),
+          updatedAt: new Date(clerkData.updated_at),
+        });
+        break;
+      case 'user.deleted':
+        if (event.data.id === null) {
+          return new Response('No User id found', { status: 400 });
+        }
+        await deleteUser(event.data.id!);
+        break;
     }
-    return new Response("webhook received",{status:200})
+  } catch {
+    return new Response('Invalid webhook', { status: 400 });
+  }
+  return new Response('webhook received', { status: 200 });
 }
-
