@@ -1,12 +1,13 @@
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { db } from '@/drizzle/db';
 import { JobInfoTable } from '@/drizzle/schema';
 import JobInfoForm from '@/features/jobInfos/components/JobInfoForm';
 import { getJobInfoUserTag } from '@/features/jobInfos/dbCache';
 import { getCurrentUser } from '@/services/clerk/lib/getCurrentUser';
 import { desc, eq } from 'drizzle-orm';
-import { Loader2Icon, PlusIcon } from 'lucide-react';
+import { ArrowRightIcon, Loader2Icon, PlusIcon } from 'lucide-react';
 import { cacheTag } from 'next/dist/server/use-cache/cache-tag';
 import Link from 'next/link';
 import React, { Suspense } from 'react';
@@ -45,7 +46,40 @@ async function JobInfos() {
           </Link>
         </Button>
       </div>
-      <div className=''></div>
+      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 has-hover:*:not-hover:opacity-70'>
+        {jobInfos.map((jobInfo)=>(
+          <Link className='hover:scale-[1.02] transition-[transform_opacity]' href={`/app/job-infos/${jobInfo.id}`}>
+            <Card className='h-full'>
+              <div className='flex items-center justify-between h-full'>
+                <div className='space-y-4 h-full'>
+                  <CardHeader>
+                    <CardTitle className='text-lg'>
+                      {jobInfo.name}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className='text-muted-foreground line-clamp-3'>
+                    {jobInfo.description}
+                  </CardContent>
+                  <CardFooter>
+                    <Badge variant="outline">{jobInfo.experience}</Badge>
+                  </CardFooter>
+                </div>
+                <CardContent>
+                <ArrowRightIcon className='size-6'/> 
+              </CardContent>
+              </div>
+            </Card>
+          </Link>
+        ))}
+        <Link href="/app/job-infos/new" className='transition-opacity'>
+        <Card className='h-full flex flex-row items-center justify-center border-dashed border-3 bg-transparent hover:border-primary/50 transition-colors shadow-none '>
+          <div className='text-lg flex items-center gap-2'>
+            <PlusIcon className='size-6'/>
+          </div>
+          New Job Description
+        </Card>
+        </Link>
+      </div>
     </div>
   );
 }
