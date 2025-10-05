@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { SignOutButton, useClerk } from '@clerk/nextjs';
-import UserAvatar from '@/components/UserAvatar';
+import UserAvatar from '@/features/users/components/UserAvatar';
 
 const NavBar = ({ user }: { user: any }) => {
   const { openUserProfile, signOut } = useClerk();
@@ -25,7 +25,7 @@ const NavBar = ({ user }: { user: any }) => {
     : '?';
 
   return (
-    <nav className="h-16 border-b">
+    <nav className="h-header border-b">
       <div className="container h-full flex items-center justify-between">
         <div className="flex items-center gap-2 select-none">
           <BrainCircuitIcon

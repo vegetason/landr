@@ -1,4 +1,8 @@
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from '../../../components/ui/avatar';
 
 export default function UserAvatar({
   user,
@@ -10,7 +14,7 @@ export default function UserAvatar({
     ? user.name
         .split(' ')
         .slice(0, 2)
-        .map((n) => n[0])
+        .map(n => n[0])
         .join('')
         .toUpperCase()
     : '??';
