@@ -8,7 +8,7 @@ const HomePage = () => {
       <SignInButton />
       <UserButton />
       <ThemeToggle />
-      <PricingTable/>
+      <PricingTable />
     </>
   );
 };
