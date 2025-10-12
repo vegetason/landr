@@ -9,7 +9,23 @@ import { InterviewTable, JobInfoTable } from '@/drizzle/schema';
 import { insertInterview, UpdateInterviewDb } from './db';
 import { getInterviewIdTag } from './dbCache';
 import { canCreateInterview } from './permission';
-import { PLAN_LIMIT_MESSAGE } from '@/services/hume/lib/errorToast';
+import { PLAN_LIMIT_MESSAGE, RATE_LIMIT_MESSAGE } from '@/services/hume/lib/errorToast';
+import arcjet, { request, tokenBucket } from '@arcjet/next';
+import { env } from '@/data/env/server';
+import { generateAiInterviewFeedback } from '@/services/ai/interviews';
+
+const aj=arcjet({
+  characteristics:["userId"],
+  key:env.ARCJET_KEY,
+  rules:[
+    tokenBucket({
+      capacity:12,
+      refillRate:4,
+      interval:"1d",
+      mode:"LIVE"
+    })
+  ]
+})
 
 export async function createInterview({
   jobInfoId,
@@ -28,6 +44,16 @@ export async function createInterview({
     return{
       error:true,
       message:PLAN_LIMIT_MESSAGE
+    }
+  }
+  const decision=await aj.protect(await request(),{
+    userId,
+    requested:1
+  })
+  if(decision.isDenied()){
+    return{
+      error:true,
+      message:RATE_LIMIT_MESSAGE
     }
   }
   const jobInfo = await getJobInfo(jobInfoId, userId);
@@ -90,6 +116,9 @@ async function getInterview(id: string, userId: string) {
         columns: {
           id: true,
           userId: true,
+          description: true,
+          title: true,
+          experience: true  
         },
       },
     },
@@ -100,4 +129,46 @@ async function getInterview(id: string, userId: string) {
   cacheTag(getJobInfoIdTag(interview?.jobInfo.id!));
   if (interview?.jobInfo.userId !== userId) return null;
   return interview;
+}
+
+export async function generateInterviewFeedback(interviewId: string) {
+  const { userId, user } = await getCurrentUser({ allData: true })
+  if (userId == null || user == null) {
+    return {
+      error: true,
+      message: "You don't have permission to do this",
+    }
+  }
+
+  const interview = await getInterview(interviewId, userId)
+  if (interview == null) {
+    return {
+      error: true,
+      message: "You don't have permission to do this",
+    }
+  }
+
+  if (interview.humeChatId == null) {
+    return {
+      error: true,
+      message: "Interview has not been completed yet",
+    }
+  }
+
+  const feedback = await generateAiInterviewFeedback({
+    humeChatId: interview.humeChatId,
+    jobInfo: interview.jobInfo,
+    userName: user.name,
+  })
+
+  if (feedback == null) {
+    return {
+      error: true,
+      message: "Failed to generate feedback",
+    }
+  }
+
+  await UpdateInterviewDb(interviewId, { feedback })
+
+  return { error: false }
 }
