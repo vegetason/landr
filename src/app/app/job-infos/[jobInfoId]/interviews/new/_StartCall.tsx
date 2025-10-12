@@ -3,11 +3,14 @@
 import { Button } from '@/components/ui/button';
 import { env } from '@/data/env/client';
 import { experienceLevelEnum, JobInfoTable } from '@/drizzle/schema';
+import { createInterview, updateInterview } from '@/features/interviews/action';
 import CondensedMessages from '@/services/hume/components/CondensedMessages';
 import { condensedChatMessages } from '@/services/hume/lib/condensedChatMessages';
+import { errorToast } from '@/services/hume/lib/errorToast';
 import { useVoice, VoiceReadyState } from '@humeai/voice-react';
 import { Loader2Icon, MicIcon, MicOff, PhoneOffIcon } from 'lucide-react';
-import { useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 const StartCall = ({
   jobInfo,
@@ -24,13 +27,57 @@ const StartCall = ({
   };
   accessToken: string;
 }) => {
-  const { connect, readyState, disconnect } = useVoice();
+  const { connect, readyState, chatMetadata, callDurationTimestamp } =
+    useVoice();
+  const [interviewId, setInterviewId] = useState<string | null>(null);
+  const durationRef = useRef(callDurationTimestamp);
+  durationRef.current = callDurationTimestamp;
+  const router = useRouter();
+  //Sync Chat Id
+  useEffect(() => {
+    if (chatMetadata?.chatId === null || interviewId === null) {
+      return;
+    }
+    updateInterview(interviewId, { humeChatId: chatMetadata?.chatId });
+  }, [chatMetadata?.chatId, interviewId]);
+  //Sync Duration
+  useEffect(() => {
+    if (interviewId == null) return;
+    const intervalId = setInterval(() => {
+      if (durationRef.current == null) {
+        return;
+      }
+      updateInterview(interviewId, { duration: durationRef.current });
+    }, 10000);
+    if (interviewId === null) {
+      return;
+    }
+    return () => clearInterval(intervalId);
+  }, [interviewId]);
+
+  //handle disconnect
+  useEffect(() => {
+    if (readyState !== VoiceReadyState.CLOSED) return;
+    if (interviewId == null) {
+      router.push(`/app/job-infos/${jobInfo.id}/interviews`);
+      return;
+    }
+    if (durationRef.current != null) {
+      updateInterview(interviewId, { duration: durationRef.current });
+    }
+    router.push(`/app/job-infos/${jobInfo.id}/interviews/${interviewId}`);
+  }, [interviewId, readyState, router, jobInfo.id]);
+
   if (readyState === VoiceReadyState.IDLE) {
     return (
       <div
         className="flex justify-center items-center h-screen-header flex-1 w-full"
         onClick={async () => {
-            
+          const res = await createInterview({ jobInfoId: jobInfo.id });
+          if (res.error) {
+            return errorToast(res.message);
+          }
+          setInterviewId(res.id);
           connect({
             auth: { type: 'accessToken', value: accessToken },
             configId: env.NEXT_PUBLIC_HUME_CONFIG_ID,
@@ -75,7 +122,6 @@ function Messages({ user }: { user: { name: string; imageUrl: string } }) {
   const { messages, fft } = useVoice();
   const condensedMessages = useMemo(() => {
     return condensedChatMessages(messages);
-  
   }, [messages]);
   return (
     <CondensedMessages

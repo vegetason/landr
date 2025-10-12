@@ -16,7 +16,7 @@ const CondensedMessages = ({
   return (
     <div className={cn('flex flex-col gap-4 w-full', className)}>
       {messages.map((message, index) => {
-        const shouldAnimate = index===messages.length - 1 && maxFft>0;
+        const shouldAnimate = index === messages.length - 1 && maxFft > 0;
         return (
           <div
             className={cn(
@@ -41,10 +41,10 @@ const CondensedMessages = ({
                 />
               </div>
             )}
-            <div className='flex flex-col gap-1'>
-                {message.content.map((text,i)=>(
-                    <span key={i}>{text}</span>
-                ))}
+            <div className="flex flex-col gap-1">
+              {message.content.map((text, i) => (
+                <span key={i}>{text}</span>
+              ))}
             </div>
           </div>
         );

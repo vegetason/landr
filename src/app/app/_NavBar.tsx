@@ -1,19 +1,34 @@
 'use client';
 
 import Link from 'next/link';
-import { BrainCircuit as BrainCircuitIcon, LogOut, User } from 'lucide-react';
+import {
+  BookOpenIcon,
+  BrainCircuit as BrainCircuitIcon,
+  FileSlidersIcon,
+  LogOut,
+  SpeechIcon,
+  User,
+} from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { SignOutButton, useClerk } from '@clerk/nextjs';
 import UserAvatar from '@/features/users/components/UserAvatar';
+import { useParams, usePathname } from 'next/navigation';
+import { Icon } from '@radix-ui/react-select';
+import { Button } from '@/components/ui/button';
+
+const navlinks = [
+  { name: 'Interviews', href: '/interviews', Icon: SpeechIcon },
+  { name: 'Questions', href: '/questions', Icon: BookOpenIcon },
+  { name: 'Resume', href: '/resume', Icon: FileSlidersIcon },
+];
 
 const NavBar = ({ user }: { user: any }) => {
   const { openUserProfile, signOut } = useClerk();
@@ -23,6 +38,9 @@ const NavBar = ({ user }: { user: any }) => {
       user.username?.[0] ||
       '?'
     : '?';
+
+  const { jobInfoId } = useParams();
+  const pathname = usePathname();
 
   return (
     <nav className="h-header border-b">
@@ -38,6 +56,23 @@ const NavBar = ({ user }: { user: any }) => {
         </div>
 
         <div className="flex items-center gap-2">
+          {typeof jobInfoId === 'string' &&
+            navlinks.map(({ name, href, Icon }) => {
+              const hrefPath = `/app/job-infos/${jobInfoId}/${href}`;
+              return (
+                <Button
+                  variant={pathname == hrefPath ? 'secondary' : 'ghost'}
+                  key={name}
+                  asChild
+                  className="cursor-pointer max-sm:hidden"
+                >
+                  <Link href={hrefPath}>
+                    <Icon />
+                    {name}
+                  </Link>
+                </Button>
+              );
+            })}
           <ThemeToggle />
 
           <DropdownMenu>
