@@ -59,6 +59,7 @@ async function JobInfos() {
           <Link
             className="hover:scale-[1.02] transition-[transform_opacity]"
             href={`/app/job-infos/${jobInfo.id}`}
+            key={jobInfo.id}
           >
             <Card className="h-full">
               <div className="flex items-center justify-between h-full">
