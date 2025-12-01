@@ -17,11 +17,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { SignOutButton, useClerk } from '@clerk/nextjs';
 import UserAvatar from '@/features/users/components/UserAvatar';
 import { useParams, usePathname } from 'next/navigation';
-import { Icon } from '@radix-ui/react-select';
 import { Button } from '@/components/ui/button';
 
 const navlinks = [
