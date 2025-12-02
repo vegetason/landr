@@ -16,10 +16,10 @@ export const env = createEnv({
   },
   createFinalSchema: env => {
     return z.object(env).transform(val => {
-      const { DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER, ...rest } = val;
+      const { DB_HOST, DB_NAME, DB_PASSWORD, DB_USER, ...rest } = val;
       return {
         ...rest,
-        DATABASE_URL: `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}`,
+        DATABASE_URL: `postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}?sslmode=require`,
       };
     });
   },

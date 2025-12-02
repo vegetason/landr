@@ -28,14 +28,16 @@ const navlinks = [
   { name: 'Resume', href: '/resume', Icon: FileSlidersIcon },
 ];
 
-const NavBar = ({ user }: { user: any }) => {
-  const { openUserProfile, signOut } = useClerk();
-
-  const initials = user
-    ? (user.firstName?.[0] ?? '') + (user.lastName?.[0] ?? '') ||
-      user.username?.[0] ||
-      '?'
-    : '?';
+const NavBar = ({ user }: { user: {
+    id: string;
+    name: string;
+    email: string;
+    username: string | null;
+    imageUrl: string;
+    createdAt: Date;
+    updatedAt: Date;
+} | undefined}) => {
+  const { openUserProfile } = useClerk();
 
   const { jobInfoId } = useParams();
   const pathname = usePathname();

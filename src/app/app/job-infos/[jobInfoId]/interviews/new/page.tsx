@@ -37,11 +37,11 @@ async function SuspendedComponent({ jobInfoId }: { jobInfoId: string }) {
   const { userId, redirectToSignIn, user } = await getCurrentUser({
     allData: true,
   });
-  if (userId === null || user === null) return redirectToSignIn();
+  if (userId == null || user == null) return redirectToSignIn();
   if(!await canCreateInterview())return redirect("/app/upgrade")
 
   const jobInfo = await getJobInfo(jobInfoId, userId);
-  if (jobInfo === null) notFound();
+  if (jobInfo == null) notFound();
   const accessToken = await fetchAccessToken({
     apiKey: env.HUME_API_KEY,
     secretKey: env.HUME_SECRET_KEY,
@@ -50,8 +50,8 @@ async function SuspendedComponent({ jobInfoId }: { jobInfoId: string }) {
   return (
     <VoiceProvider>
       <StartCall
-        jobInfo={jobInfo as any}
-        user={user as any}
+        jobInfo={jobInfo}
+        user={user}
         accessToken={accessToken}
       />
     </VoiceProvider>

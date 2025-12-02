@@ -8,7 +8,10 @@ export default function UserAvatar({
   user,
   ...props
 }: {
-  user: { name: string; imageUrl: string };
+  user:  {
+    name: string;
+    imageUrl:string
+} | undefined;
 } & React.ComponentProps<typeof Avatar>) {
   const initials = user?.name
     ? user.name
