@@ -8,6 +8,7 @@ export const env = createEnv({
     NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL: z.string().min(1),
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),
     NEXT_PUBLIC_HUME_CONFIG_ID: z.string().min(1),
+    NEXT_PUBLIC_FRONTENDURL: z.string().default(''),
   },
   emptyStringAsUndefined: true,
   experimental__runtimeEnv: {
@@ -18,7 +19,7 @@ export const env = createEnv({
       process.env.NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL,
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
       process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-
     NEXT_PUBLIC_HUME_CONFIG_ID: process.env.NEXT_PUBLIC_HUME_CONFIG_ID,
+    NEXT_PUBLIC_FRONTENDURL: process.env.NEXT_PUBLIC_FRONTENDURL || '',
   },
 });

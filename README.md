@@ -1,36 +1,229 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Landr 🧠
+
+An AI-powered job interview preparation platform designed to help candidates practice, learn, and excel in technical and behavioral interviews.
+
+> **⚠️ Status: Early Development** - This project is currently in active development. Some premium features and payment functionality require additional service subscriptions that are not yet enabled.
+
+You can visit the live demo at  **[Landr](https://landr-tau.vercel.app/)**
+
+## Features
+
+### 🎤 AI Mock Interviews
+- Real-time voice-based interviews powered by Hume AI
+- Realistic conversation flow with adaptive interviewer responses
+- Performance feedback based on communication clarity, confidence, and technical knowledge
+- Interview history and analytics
+- The AI Mock Interviews feature is fully functional but not activated on the live demo to optimize API costs. To test it, configure your Hume AI credentials locally in `.env.local` and start practicing voice-based interviews immediately on your machine.
+
+### 📝 Resume Analysis
+- AI-powered resume review tailored to job descriptions
+- ATS (Applicant Tracking System) compatibility scoring
+- Keyword coverage analysis
+- Specific, actionable improvement suggestions
+- Job match analysis
+
+### 💡 Technical Question Practice
+- AI-generated coding and technical questions matched to job requirements
+- Difficulty levels: Easy, Medium, Hard
+- Real-time feedback on answers
+- Complete solution references
+- Question bank organized by difficulty and topic
+
+### 📋 Job Description Management
+- Store and manage job descriptions you're targeting
+- AI uses job context to personalize all preparation materials
+- Support for multiple job targets
+
+## Tech Stack
+
+### Frontend
+- **Framework**: Next.js (App Router, TypeScript)
+- **Styling**: Tailwind CSS 4
+- **UI Components**: shadcn/ui with Radix UI primitives
+- **State Management**: React Hooks
+- **Icons**: Lucide React
+
+### Backend
+- **Runtime**: Node.js with Next.js API Routes
+- **Database**: PostgreSQL with Drizzle ORM
+- **Authentication**: Clerk
+- **AI Services**:
+  - **Voice Interviews**: Hume AI Empathetic Voice
+  - **Content Generation**: Google Gemini 2.5 Flash
+- **Security**: Arcjet (rate limiting, bot detection, DDoS protection)
+- **Real-time Voice**: @humeai/voice-react
+
+### DevOps & Tools
+- **ORM**: Drizzle Kit (migrations, introspection)
+- **Code Quality**: ESLint, Prettier
+- **Type Safety**: TypeScript, Zod
+- **Caching**: Next.js Data Cache with cache tags
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js 18+ 
+- PostgreSQL database
+- Accounts and API keys for:
+  - Clerk (authentication)
+  - Hume AI (voice interviews)
+  - Google Generative AI (content generation)
+  - Arcjet (security)
 
+### Installation
+
+1. **Clone the repository**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd landr
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Set up environment variables**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a `.env.local` file with variables as in env.example and make sure you make a public port of the application and create your clerk endpoint like `portLink/api/webhooks/clerk`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+3. **Start PostgreSQL**
+```bash
+docker-compose up -d
+```
 
-To learn more about Next.js, take a look at the following resources:
+4. **Set up database**
+```bash
+npm run db:migrate
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. **Run development server**
+```bash
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+6. **Open in browser**
+Navigate to [http://localhost:3000](http://localhost:3000)
 
-## Deploy on Vercel
+## Available Scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+# Development
+npm run dev              # Start development server with Turbopack
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Building
+npm run build            # Build for production
+npm start                # Start production server
+
+# Database
+npm run db:push          # Push schema to database
+npm run db:generate      # Generate migrations
+npm run db:migrate       # Run migrations
+npm run db:studio        # Open Drizzle Studio
+
+# Code Quality
+npm run lint             # Run ESLint
+```
+
+## Project Structure
+
+```
+src/
+├── app/                          # Next.js App Router
+│   ├── app/                      # Authenticated app pages
+│   │   ├── job-infos/           # Job description management
+│   │   │   └── [jobInfoId]/
+│   │   │       ├── interviews/  # Mock interview feature
+│   │   │       ├── questions/   # Technical questions
+│   │   │       ├── resume/      # Resume analysis
+│   │   │       └── edit/        # Job info editing
+│   │   ├── layout.tsx           # App layout with navigation
+│   │   └── page.tsx             # Dashboard
+│   ├── api/                      # API routes
+│   │   ├── ai/                  # AI generation endpoints
+│   │   └── webhooks/            # Webhook handlers
+│   ├── sign-in/                 # Clerk sign-in page
+│   ├── onboarding/              # User onboarding
+│   ├── globals.css              # Global styles
+│   └── layout.tsx               # Root layout
+├── components/                   # Reusable UI components
+│   └── ui/                      # shadcn/ui components
+├── features/                     # Feature modules
+│   ├── interviews/              # Interview logic
+│   ├── questions/               # Question generation
+│   ├── jobInfos/                # Job management
+│   ├── resumeAnalysis/          # Resume analysis
+│   └── users/                   # User management
+├── services/                     # External service integrations
+│   ├── ai/                      # AI service (Gemini, Hume)
+│   ├── clerk/                   # Clerk integration
+│   └── hume/                    # Hume Voice integration
+├── drizzle/                      # Database schema and migrations
+│   └── schemas/                 # Table definitions
+├── data/                         # Environment and config
+│   └── env/                     # Environment variable schemas
+└── lib/                          # Utility functions
+```
+
+## Key Features in Development
+
+### Currently Limited (Requires Premium Subscriptions)
+- **Clerk Premium**: Payment processing and subscription management
+  - Currently: Free tier limits apply
+  - Needed for: Pricing tiers, billing, subscription features
+  
+- **Hume Premium**: Advanced voice AI features
+  - Currently: Limited API access
+  - Needed for: Unlimited interview sessions, advanced emotion analysis
+  
+- **Arcjet Premium**: Advanced security features
+  - Currently: Basic rate limiting and bot detection
+  - Needed for: Advanced DDoS protection, priority support
+
+### Fully Functional Features
+✅ Job description management  
+✅ AI interview practice with voice  
+✅ Resume analysis and feedback  
+✅ Technical question generation  
+✅ User authentication and profiles  
+✅ Interview history and tracking  
+✅ Basic rate limiting and security  
+
+## Development Roadmap
+
+- [ ] Enable Clerk premium for subscription management
+- [ ] Implement tiered pricing plans (Free, Pro, Premium)
+- [ ] Full Hume AI integration for advanced voice features
+- [ ] Arcjet premium security features
+- [ ] Mobile app (React Native)
+- [ ] Interview analytics dashboard
+- [ ] Peer comparison and leaderboards
+- [ ] Custom question creation
+- [ ] Export interview transcripts and feedback
+- [ ] Integration with job listing APIs
+
+## Contributing
+
+This project is in early development. Contributions are welcome! Please feel free to:
+1. Report bugs
+2. Suggest features
+3. Submit pull requests
+
+## License
+
+MIT License - feel free to use this project for learning and development.
+
+## Support
+
+For issues, questions, or suggestions, please open an issue in the repository.
+
+## Acknowledgments
+
+- [Next.js](https://nextjs.org/) - React framework
+- [Clerk](https://clerk.com/) - Authentication
+- [Hume AI](https://www.humanlevel.ai/) - Voice AI
+- [Google Generative AI](https://ai.google.dev/) - Content generation
+- [Arcjet](https://arcjet.com/) - Security
+- [shadcn/ui](https://ui.shadcn.com/) - UI components
+- [Drizzle ORM](https://orm.drizzle.team/) - Database ORM
+
+---
+
+**Built with ❤️ to help people ace their job interviews**
