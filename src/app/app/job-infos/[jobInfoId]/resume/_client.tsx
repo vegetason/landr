@@ -13,12 +13,13 @@ import { Skeleton } from "@/components/skeleton";
 import { Badge } from "@/components/ui/badge";
 import z from "zod";
 import { DeepPartial } from "ai";
+import { env } from "@/data/env/client";
 
 export function ResumeClientPage({jobInfoId}:{jobInfoId:string}){
     const [isDragOver,setIsDragOver]=useState(false)
     const fileRef=useRef<File|null>(null)
     const {object:aiAnalysis,isLoading,submit:generateAnalysis}=useObject({
-        api:"http://localhost:3000/api/ai/resumes/analyze",
+        api:`${env.NEXT_PUBLIC_FRONTENDURL}api/ai/resumes/analyze`,
         schema:aiAnalyzeSchema,
         fetch:(url,options)=>{
             const headers=new Headers(options?.headers)

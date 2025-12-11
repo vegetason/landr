@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { env } from '@/data/env/client';
-import { experienceLevelEnum, JobInfoTable } from '@/drizzle/schema';
+import {  JobInfoTable } from '@/drizzle/schema';
 import { createInterview, updateInterview } from '@/features/interviews/action';
 import CondensedMessages from '@/services/hume/components/CondensedMessages';
 import { condensedChatMessages } from '@/services/hume/lib/condensedChatMessages';
